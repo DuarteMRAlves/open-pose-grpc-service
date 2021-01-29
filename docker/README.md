@@ -54,3 +54,4 @@ In order to use this docker image execute the following steps:
 
  ```
  $ docker run --rm -it --name open-pose-grpc-estimation open-pose-grpc-estimation:latest
+ ```

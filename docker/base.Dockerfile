@@ -7,9 +7,6 @@ RUN apt-get update && \
 
 FROM tensorflow/tensorflow:1.14.0-py3
 
-ARG USER=runner
-ARG GROUP=runner-group
-
 RUN apt-get update && \
     pip install --upgrade pip && \ 
     apt-get install --no-install-recommends -y \
@@ -20,9 +17,6 @@ RUN apt-get update && \
     # Does not install graphical modules
     # See https://github.com/opencv/opencv-python#installation-and-usage
     pip install opencv-python-headless Cython grpcio && \
-    # Add non-privileged user to execute the container
-    addgroup --system ${GROUP} && \
-    adduser --system --no-create-home --ingroup ${GROUP} ${USER} && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /open-pose-grpc/ /open-pose-grpc/
@@ -34,6 +28,3 @@ RUN pip install .
 # Remove package sources
 WORKDIR /
 RUN rm -rf /open-pose-grpc
-
-# Change user
-USER ${USER}
