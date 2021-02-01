@@ -38,11 +38,37 @@ class PoseEstimationService(pose_grpc.OpenPoseEstimatorServicer):
         # Preprocess image
         img_bytes = request.data
         img_array = np.frombuffer(img_bytes, np.uint8)
-        img_np = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+        img_np = cv2.imdecode(img_array, -1)
         # Infer poses
-        poses = self.__estimator.inference(img_np)
-        print(poses)
-        return pose_pb2.DetectedPoses()
+        poses = self.__estimator.inference(
+            img_np,
+            resize_to_default=True,
+            upsample_size=4.0)
+        # Build response
+        return self.__build_detected_poses(poses)
+
+    @staticmethod
+    def __build_detected_poses(poses):
+        return pose_pb2.DetectedPoses(
+            poses=map(
+                PoseEstimationService.__build_pose,
+                poses))
+
+    @staticmethod
+    def __build_pose(pose):
+        return pose_pb2.Pose(
+            key_points=map(
+                PoseEstimationService.__build_key_point,
+                pose.body_parts.values()))
+
+    @staticmethod
+    def __build_key_point(body_part):
+        return pose_pb2.KeyPoint(
+            index=body_part.part_idx,
+            x=body_part.x,
+            y=body_part.y,
+            score=body_part.score)
+
 
 
 if __name__ == '__main__':

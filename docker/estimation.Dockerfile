@@ -42,6 +42,8 @@ COPY ${GRPC_SERVICES_DIR} ${WORKDIR}/
 # Change user
 USER ${USER}
 
+EXPOSE 50051
+
 WORKDIR ${WORKDIR}/
 
 CMD ["python", "estimation_server.py"]

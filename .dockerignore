@@ -21,3 +21,7 @@ chk*.meta
 lifting
 slim
 
+# grpc_services files
+/**/*_pb2.py
+/**/*_pb2_grpc.py
+
