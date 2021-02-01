@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import concurrent.futures as futures
 import grpc
@@ -5,14 +6,17 @@ import logging
 import numpy as np
 import open_pose_estimation_pb2_grpc as pose_grpc
 import open_pose_estimation_pb2 as pose_pb2
+import os
 import tf_pose
 import time
 
 
+_PORT_ENV_VAR = 'PORT'
+_DEFAULT_PORT = 50051
+
+
 # Model to use
 _MODEL = 'mobilenet_thin'
-
-_ADDRESS = '[::]:50051'
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
@@ -29,10 +33,8 @@ class PoseEstimationService(pose_grpc.OpenPoseEstimatorServicer):
         Args:
             request: request with the image bytes to use
             context: context of the call
-
         Returns:
             a message with the key-points of the detected poses
-
         """
 
         # Preprocess image
@@ -70,6 +72,46 @@ class PoseEstimationService(pose_grpc.OpenPoseEstimatorServicer):
             score=body_part.score)
 
 
+def get_port():
+    """
+    Parses the port where the server should listen
+    Exists the program if the environment variable
+    is not an int or the value is not positive
+    Returns:
+        the port where the server should listen
+    """
+    try:
+        server_port = int(os.getenv(_PORT_ENV_VAR, _DEFAULT_PORT))
+        if server_port <= 0:
+            logging.error('Port should be greater than 0')
+            exit(1)
+        return server_port
+    except ValueError:
+        logging.exception('Unable to parse port')
+        exit(1)
+
+
+def parse_args():
+    """
+    Parse the command line arguments
+    Returns:
+        An object with the values for the received arguments
+    """
+
+    def port_type(x):
+        if not isinstance(x, int) or x <= 0:
+            raise argparse.ArgumentTypeError('Port must be positive integer')
+        return x
+
+    parser = argparse.ArgumentParser(description='Open Pose Representation gRPC Service')
+    parser.add_argument(
+        '--port',
+        default=50051,
+        # Port should be positive integer
+        type=port_type,
+        help='POrt where the server should listen')
+    return parser.parse_args()
+
 
 if __name__ == '__main__':
     logging.basicConfig()
@@ -77,9 +119,11 @@ if __name__ == '__main__':
     pose_grpc.add_OpenPoseEstimatorServicer_to_server(
         PoseEstimationService(),
         server)
-    server.add_insecure_port(_ADDRESS)
+    port = get_port()
+    target = f'[::]:{port}'
+    server.add_insecure_port(target)
     server.start()
-    logging.getLogger().info("Server started")
+    print(f'Server started at {target}')
     try:
         while True:
             time.sleep(_ONE_DAY_IN_SECONDS)

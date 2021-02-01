@@ -19,6 +19,7 @@ WORKDIR ${WORKDIR}/
 RUN python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. open_pose_estimation.proto && \
     rm open_pose_estimation.proto
 
+
 # Build the final image
 FROM open-pose-grpc-base:latest
 # Renew workdir arg
@@ -27,6 +28,9 @@ ARG WORKDIR
 ARG USER=runner
 ARG GROUP=runner-group
 ARG GRPC_SERVICES_DIR=grpc_services
+
+# Define PORT environment variable for the server
+ENV PORT=50051
 
 RUN echo ${USER}:${GROUP} with workdir ${WORKDIR}
 
@@ -42,7 +46,7 @@ COPY ${GRPC_SERVICES_DIR} ${WORKDIR}/
 # Change user
 USER ${USER}
 
-EXPOSE 50051
+EXPOSE ${PORT}
 
 WORKDIR ${WORKDIR}/
 
