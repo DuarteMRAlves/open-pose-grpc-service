@@ -28,7 +28,7 @@ In order to use this docker image execute the following steps:
  $ docker build --tag open-pose-grpc-base:latest -f docker/base.Dockerfile .
  ```
 
- * Run a container with the image;
+ * Run a container with the image:
 
  ```
  $ docker run --rm -it --name open-pose-grpc-base open-pose-grpc-base:latest
@@ -50,8 +50,8 @@ In order to use this docker image execute the following steps:
  $ docker build --tag open-pose-grpc-estimation:latest -f docker/estimation.Dockerfile .
  ```
 
- * Run a container with the image;
+ * Run a container with the image *(The port to publish can change byt the server expects port 50051)*:
 
  ```
- $ docker run --rm -it --name open-pose-grpc-estimation open-pose-grpc-estimation:latest
+ $ docker run --rm -it -p 50051:50051 --name open-pose-grpc-estimation open-pose-grpc-estimation:latest
  ```

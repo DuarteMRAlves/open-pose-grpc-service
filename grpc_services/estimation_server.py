@@ -28,13 +28,15 @@ class PoseEstimationService(pose_grpc.OpenPoseEstimatorServicer):
         self.__estimator = tf_pose.get_estimator(_MODEL)
 
     def estimate(self, request: 'pose_pb2.Image', context: 'grpc.ServicerContext'):
-        """
-        Handle an estimate request
+        """Handle an estimate request
+
         Args:
             request: request with the image bytes to use
             context: context of the call
+
         Returns:
             a message with the key-points of the detected poses
+
         """
 
         # Preprocess image
@@ -51,6 +53,18 @@ class PoseEstimationService(pose_grpc.OpenPoseEstimatorServicer):
 
     @staticmethod
     def __build_detected_poses(poses):
+        """
+        Builds the response message DetectedPoses
+        from the predicted poses
+
+        Args:
+            poses: Poses predicted by the OpenPose model
+
+        Returns:
+            The DetectedPoses message with
+            all the identified poses
+
+        """
         return pose_pb2.DetectedPoses(
             poses=map(
                 PoseEstimationService.__build_pose,
@@ -58,6 +72,18 @@ class PoseEstimationService(pose_grpc.OpenPoseEstimatorServicer):
 
     @staticmethod
     def __build_pose(pose):
+        """
+        Builds a Pose protobuf message from a Human
+        object predicted by the OpenPose model
+
+        Args:
+            pose: the Human object with the pose
+
+        Returns:
+            The Pose protobuf message with the pose key-points
+
+        """
+
         return pose_pb2.Pose(
             key_points=map(
                 PoseEstimationService.__build_key_point,
@@ -65,6 +91,16 @@ class PoseEstimationService(pose_grpc.OpenPoseEstimatorServicer):
 
     @staticmethod
     def __build_key_point(body_part):
+        """
+        Builds a KeyPoint protobuf message from
+        a BodyPart predicted by the OpenPose model
+
+        Args:
+            body_part: the BodyPart object
+
+        Returns: The Keypoint protobuf message
+                 with the BodyPart predicted values
+        """
         return pose_pb2.KeyPoint(
             index=body_part.part_idx,
             x=body_part.x,
@@ -77,8 +113,9 @@ def get_port():
     Parses the port where the server should listen
     Exists the program if the environment variable
     is not an int or the value is not positive
+
     Returns:
-        the port where the server should listen
+        The port where the server should listen
     """
     try:
         server_port = int(os.getenv(_PORT_ENV_VAR, _DEFAULT_PORT))
@@ -91,28 +128,6 @@ def get_port():
         exit(1)
 
 
-def parse_args():
-    """
-    Parse the command line arguments
-    Returns:
-        An object with the values for the received arguments
-    """
-
-    def port_type(x):
-        if not isinstance(x, int) or x <= 0:
-            raise argparse.ArgumentTypeError('Port must be positive integer')
-        return x
-
-    parser = argparse.ArgumentParser(description='Open Pose Representation gRPC Service')
-    parser.add_argument(
-        '--port',
-        default=50051,
-        # Port should be positive integer
-        type=port_type,
-        help='POrt where the server should listen')
-    return parser.parse_args()
-
-
 if __name__ == '__main__':
     logging.basicConfig()
     server = grpc.server(futures.ThreadPoolExecutor())
@@ -123,7 +138,7 @@ if __name__ == '__main__':
     target = f'[::]:{port}'
     server.add_insecure_port(target)
     server.start()
-    print(f'Server started at {target}')
+    logging.info(f'Server started at {target}')
     try:
         while True:
             time.sleep(_ONE_DAY_IN_SECONDS)
