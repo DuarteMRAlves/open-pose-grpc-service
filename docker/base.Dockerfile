@@ -16,7 +16,7 @@ RUN apt-get update && \
     # Install headless version of opencv-python for server usage
     # Does not install graphical modules
     # See https://github.com/opencv/opencv-python#installation-and-usage
-    pip install opencv-python-headless Cython grpcio && \
+    pip install opencv-python-headless Cython grpcio==1.21.1 grpcio-reflection==1.21.1 protobuf==3.8.0 && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /open-pose-grpc/ /open-pose-grpc/

@@ -2,6 +2,7 @@ import argparse
 import cv2
 import concurrent.futures as futures
 import grpc
+import grpc_reflection.v1alpha.reflection as grpc_reflection
 import logging
 import numpy as np
 import open_pose_estimation_pb2_grpc as pose_grpc
@@ -136,6 +137,15 @@ if __name__ == '__main__':
         server)
     port = get_port()
     target = f'[::]:{port}'
+
+    # Add reflection
+    service_names = (
+        pose_pb2.DESCRIPTOR.services_by_name['OpenPoseEstimator'].full_name,
+        grpc_reflection.SERVICE_NAME
+    )
+
+    grpc_reflection.enable_server_reflection(service_names, server)
+
     server.add_insecure_port(target)
     server.start()
     logging.info(f'Server started at {target}')
