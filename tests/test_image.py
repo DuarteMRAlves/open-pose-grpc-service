@@ -70,8 +70,8 @@ def parse_args():
     parser.add_argument(
         '--target',
         metavar='target',
-        default='localhost:50051',
-        help='Location of the tested server (defaults to localhost:50051)')
+        default='localhost:8061',
+        help='Location of the tested server (defaults to localhost:8061)')
     return parser.parse_args()
 
 

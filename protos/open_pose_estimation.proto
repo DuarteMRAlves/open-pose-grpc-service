@@ -35,7 +35,7 @@ message Pose {
  * param index: index of the keypoint in the person skeleton
  * param x: x coordinate of the keypoint
  * param y: y coordinate of the keypoint
- * param confidence: confidence score for the keypoint
+ * param score: confidence score for the keypoint
  */
 message KeyPoint {
     uint32 index = 1;

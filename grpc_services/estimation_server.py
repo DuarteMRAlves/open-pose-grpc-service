@@ -13,7 +13,7 @@ import time
 
 
 _PORT_ENV_VAR = 'PORT'
-_DEFAULT_PORT = 50051
+_DEFAULT_PORT = 8061
 
 
 # Model to use
@@ -129,8 +129,7 @@ def get_port():
         exit(1)
 
 
-if __name__ == '__main__':
-    logging.basicConfig()
+def run_server():
     server = grpc.server(futures.ThreadPoolExecutor())
     pose_grpc.add_OpenPoseEstimatorServicer_to_server(
         PoseEstimationService(),
@@ -147,10 +146,18 @@ if __name__ == '__main__':
     grpc_reflection.enable_server_reflection(service_names, server)
 
     server.add_insecure_port(target)
+    logging.info('Starting Open Pose Server at %s', target)
     server.start()
-    logging.info(f'Server started at {target}')
     try:
         while True:
             time.sleep(_ONE_DAY_IN_SECONDS)
     except KeyboardInterrupt:
         server.stop(0)
+
+
+if __name__ == '__main__':
+    logging.basicConfig(
+        format='[ %(levelname)s ] %(asctime)s (%(module)s) %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+        level=logging.INFO)
+    run_server()
