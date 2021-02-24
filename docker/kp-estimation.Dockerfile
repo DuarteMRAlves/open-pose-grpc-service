@@ -22,7 +22,7 @@ RUN python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. ${PROTO_F
 
 
 # Build the final image
-FROM open-pose-grpc-base:latest
+FROM sipgisr/open-pose-grpc:base-latest
 # Renew build args
 ARG WORKSPACE
 ARG PROTO_FILE

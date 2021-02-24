@@ -25,20 +25,20 @@ In order to use this docker image execute the following steps:
  * Build the image:
 
  ```
- $ docker build --tag open-pose-grpc-base:latest -f docker/base.Dockerfile .
+ $ docker build --tag sipgisr/open-pose-grpc:base-latest -f docker/base.Dockerfile .
  ```
 
  * Run a container with the image:
 
  ```
- $ docker run --rm -it --name open-pose-grpc-base open-pose-grpc-base:latest
+ $ docker run --rm -it sipgisr/open-pose-grpc:base-latest
  ```
 
-### Estimation
+### Key Points Estimation
 
 #### Overview
 
-This image offers a service for estimating the poses in a given image.
+This image offers a service for estimating key points for human poses in a given image.
 
 #### Usage
 
@@ -47,11 +47,11 @@ In order to use this docker image execute the following steps:
  * Build the image:
 
  ```
- $ docker build --tag open-pose-grpc-estimation:latest -f docker/estimation.Dockerfile .
+ $ docker build --tag sipgisr/open-pose-grpc:kp-estimation-latest -f docker/kp-estimation.Dockerfile .
  ```
 
  * Run a container with the image *(The port to publish can change, but the server expects port 8061)*:
 
  ```
- $ docker run --rm -it -p 8061:8061 --name open-pose-grpc-estimation open-pose-grpc-estimation:latest
+ $ docker run --rm -it -p 8061:8061 sipgisr/open-pose-grpc:kp-estimation-latest
  ```
